@@ -6,6 +6,7 @@ import { currencyFormatter } from "@/lib/utils";
 import { ExpensesItems } from "@/components/ExpensesItems";
 import { Modal } from "@/components/Modal";
 import { classifyExpense } from "@/lib/classifyExpense";
+import { getCategoryIcon } from "@/lib/Icons";
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
@@ -67,7 +68,6 @@ export default function Home() {
 
   }
 
-
   const deleteIncomeEntryHandler = async (id: string) => {
     const docRef = doc(db, "income", id);
     try {
@@ -102,15 +102,15 @@ export default function Home() {
 
   const addExpenseHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-  
+
     const description = expenseDescriptionRef.current?.value;
     const amount = expenseAmountRef.current?.value;
-  
+
     if (!description || !amount) return;
-  
+
     // Llamar a la API para clasificar la categoría del gasto
     const categoryData = await classifyExpense(description);
-  
+
     const newExpense = {
       amount,
       description,
@@ -119,15 +119,15 @@ export default function Home() {
       color: categoryData.color,
       createAt: new Date(),
     };
-  
+
     try {
       const docRef = await addDoc(collection(db, "expenses"), newExpense);
-  
+
       setExpenses((prev) => [
         ...prev,
         { id: docRef.id, ...newExpense },
       ]);
-  
+
       expenseDescriptionRef.current!.value = "";
       expenseAmountRef.current!.value = "";
       setShowAddExpenseModal(false);
@@ -135,7 +135,7 @@ export default function Home() {
       console.error("Error adding expense:", error);
     }
   };
-  
+
   return (
     <>
       <Modal show={showAddIncomeModal} onClose={setShowAddIncomeModal}>
@@ -218,26 +218,27 @@ export default function Home() {
           <h2 className="text-4xl font-bold">{currencyFormatter(10000)}</h2>
         </section>
         <section className="flex items-center justify-between mt-6">
-          <button onClick={() => { setShowAddExpenseModal(true)}} className="btn text-lime-600"> + Expenses</button>
-          <button onClick={() => { setShowAddIncomeModal(true)}} className="btn text-red-600"> + Income </button>
+          <button onClick={() => { setShowAddExpenseModal(true) }} className="btn text-lime-600"> + Expenses</button>
+          <button onClick={() => { setShowAddIncomeModal(true) }} className="btn text-red-600"> + Income </button>
         </section>
         <section className="py-6">
           <h3 className="text-2xl">My expenses</h3>
           <span className="flex flex-col gap-4 mt-4">
+            {expenses.map((expense) => (
+              <section key={expense.id} className="flex items-center justify-between px-4 py-2 bg-slate-700 rounded-md">
+                <span className="flex items-center gap-2">
+                  <span style={{ color: expense.color }}>{getCategoryIcon(expense.category)}</span>
+                  <p className="font-semibold">{expense.description}</p>
+                </span>
+                <span>{expense.category}</span>
+                <p className="flex items-center gap-2">{currencyFormatter(expense.amount)}</p>
+                <button className="text-red-600 hover:text-red-400 transition-colors duration-200">
+                  <FaRegTrashAlt />
+                </button>
+              </section>
+            ))}
           </span>
-          {expenses.map((expense) => (
-            <section key={expense.id} className="flex items-center justify-between px-4 py-2 bg-slate-700 rounded-md">
-              <span className="flex items-center gap-2">
-                <span style={{ color: expense.color }}>{expense.icon}</span>
-                <p className="font-semibold">{expense.description}</p>
-              </span>
-              <span>{expense.category}</span>
-              <p className="flex items-center gap-2">{currencyFormatter(expense.amount)}</p>
-              <button className="text-red-600 hover:text-red-400 transition-colors duration-200">
-                <FaRegTrashAlt />
-              </button>
-            </section>
-          ))}
+
           <span className="mt-6 flex items-center justify-center w-2/3 mx-auto">
           </span>
         </section>

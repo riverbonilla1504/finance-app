@@ -1,7 +1,7 @@
 import { JSX } from "react";
 import { FaUtensils, FaBus, FaFilm, FaShoppingCart, FaQuestion } from "react-icons/fa";
 
-// 🔹 Asocia cada categoría con un ícono
+
 const categoryIcons: Record<string, JSX.Element> = {
   "Food": <FaUtensils />,
   "Transport": <FaBus />,
@@ -62,12 +62,12 @@ export const classifyExpense = async (description: string) => {
     // 🔹 Verifica si la categoría es válid
     console.log("Categoría cruda:", rawCategory);
     const category = categoryIcons[rawCategory] ? rawCategory : "Other";
-    console.log("Categoría final:",category);
+    console.log("Categoría final:", category);
     const test = "example string";
-    console.log("sdad:",test);
+    console.log("sdad:", test);
     return {
       category,
-      icon: categoryIcons[category],
+      icon: category,
       color: getCategoryColor(category),
     };
   } catch (error) {
