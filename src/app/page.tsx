@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from "react";
 
 import { currencyFormatter } from "@/lib/utils";
-import { ExpensesItems } from "@/components/ExpensesItems";
 import { Modal } from "@/components/Modal";
 import { classifyExpense } from "@/lib/classifyExpense";
 import { getCategoryIcon } from "@/lib/Icons";
@@ -11,7 +10,7 @@ import FinancialChatbot from "@/components/FinancialChatBot";
 import { Income, Expense } from "@/lib/types/financial";
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
-import { Doughnut } from "react-chartjs-2";
+//import { Doughnut } from "react-chartjs-2";
 import { FaRegTrashAlt } from "react-icons/fa";
 
 import { db } from "@/lib/firebase";
@@ -63,14 +62,14 @@ export default function Home() {
     }
   };
 
-  const deleteIncomeEntryHandler = async (id: string) => {
-    try {
-      await deleteDoc(doc(db, "income", id));
-      setIncome((prevState) => prevState.filter((income) => income.id !== id));
-    } catch (error) {
-      console.error("Error deleting income:", error);
-    }
-  };
+  //const deleteIncomeEntryHandler = async (id: string) => {
+  //  try {
+  //    await deleteDoc(doc(db, "income", id));
+  //    setIncome((prevState) => prevState.filter((income) => income.id !== id));
+  //  } catch (error) {
+  //    console.error("Error deleting income:", error);
+  //  }
+  //};
 
   useEffect(() => {
     const getIncomeData = async () => {
