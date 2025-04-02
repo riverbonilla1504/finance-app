@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { FaComment, FaTimes } from "react-icons/fa";
 import { IoSend } from "react-icons/io5";
-import { Expense, Income } from "@/lib/types/financial"; // Importa los tipos correctamente
+import { Expense, Income } from "@/lib/types/financial";
 
 interface ChatMessage {
     type: 'user' | 'bot';
@@ -71,7 +71,7 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
                 })),
                 incomes: incomes.map(i => ({
                     amount: i.amount,
-                    description: i.description,  // Cambié source a category para que coincida con el tipo
+                    description: i.description,
                     createAt: i.createAt
                 })),
                 totalExpenses: expenses.reduce((sum, expense) => sum + expense.amount, 0),
@@ -130,73 +130,85 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
     return (
         <>
             {showChatbot && (
-                <div className="max-w-2xl  w-80 sm:w-96 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 z-50">
-                    <div className="chatbot-header bg-blue-600 text-black p-3 flex justify-between items-center">
-                        <span className="font-medium">Asistente Financiero</span>
+                <article className="max-w-2xl w-80 sm:w-96 bg-card rounded-lg shadow-lg overflow-hidden border border-border z-50">
+
+                    <header className="bg-primary text-primary-foreground p-3 flex justify-between items-center">
+                        <span className="font-medium">Finance Asistance</span>
                         <button
                             onClick={() => setShowChatbot(false)}
-                            className="text-white hover:text-gray-200"
+                            className="text-primary-foreground hover:text-secondary transition-colors"
                             aria-label="Cerrar asistente"
                         >
                             <FaTimes />
                         </button>
-                    </div>
+                    </header>
 
-                    <div className="chatbot-messages h-80 overflow-y-auto p-3 bg-gray-50">
+
+                    <section
+                        className="chatbot-messages h-80 overflow-y-auto p-3 bg-background/50
+          [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full
+          [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar]:h-2
+          [&::-webkit-scrollbar-track]:bg-card [&::-webkit-scrollbar-thumb]:bg-primary
+          hover:[&::-webkit-scrollbar-thumb]:bg-primary-hover"
+                    >
                         {chatMessages.map((msg, index) => (
-                            <div
+                            <article
                                 key={index}
-                                className={`message p-2 rounded-lg mb-2 max-w-[85%] ${msg.type === 'user'
-                                    ? 'message-user bg-blue-500 text-white ml-auto'
-                                    : 'message-bot bg-gray-200 text-gray-800'
+                                className={`p-3 rounded-lg mb-3 max-w-[85%] ${msg.type === 'user'
+                                    ? 'bg-primary text-primary-foreground ml-auto'
+                                    : 'bg-card text-primary-foreground border border-border'
                                     }`}
                             >
                                 {msg.content}
-                            </div>
+                            </article>
                         ))}
-                        {isLoading && (
-                            <div className="message message-bot bg-gray-200 text-gray-800 p-2 rounded-lg mb-2 max-w-[85%]">
-                                <div className="typing-indicator flex space-x-1">
-                                    <span className="dot bg-gray-500 rounded-full w-2 h-2 animate-bounce"></span>
-                                    <span className="dot bg-gray-500 rounded-full w-2 h-2 animate-bounce delay-75"></span>
-                                    <span className="dot bg-gray-500 rounded-full w-2 h-2 animate-bounce delay-150"></span>
-                                </div>
-                            </div>
-                        )}
-                        <div ref={messagesEndRef} />
-                    </div>
 
-                    <form onSubmit={handleChatSubmit} className="chatbot-input p-3 border-t border-gray-200 flex">
+
+                        {isLoading && (
+                            <article className="bg-card text-primary-foreground p-3 rounded-lg mb-3 max-w-[85%] border border-border">
+                                <span className="typing-indicator flex space-x-2 justify-center">
+                                    <span className="dot w-2 h-2 rounded-full bg-primary-foreground animate-pulse" style={{ animationDelay: '0ms' }}></span>
+                                    <span className="dot w-2 h-2 rounded-full bg-primary-foreground animate-pulse" style={{ animationDelay: '150ms' }}></span>
+                                    <span className="dot w-2 h-2 rounded-full bg-primary-foreground animate-pulse" style={{ animationDelay: '300ms' }}></span>
+                                </span>
+                            </article>
+                        )}
+                        <span ref={messagesEndRef} />
+                    </section>
+
+
+                    <form onSubmit={handleChatSubmit} className="p-3 border-t border-border flex">
                         <input
                             type="text"
                             value={chatInput}
                             onChange={(e) => setChatInput(e.target.value)}
-                            placeholder="Pregunta sobre tus finanzas..."
-                            className="flex-1 p-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            placeholder="Ask about your finances..."
+                            className="flex-1 p-2 border border-border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary bg-card text-primary-foreground"
                             disabled={isLoading}
                         />
                         <button
                             type="submit"
-                            className="bg-blue-600 text-white p-2 rounded-r-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="bg-primary text-primary-foreground p-2 rounded-r-lg hover:bg-primary-hover transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
                             disabled={isLoading}
                         >
                             <IoSend />
                         </button>
                     </form>
-                </div>
+                </article>
             )}
+
 
             {!showChatbot && (
                 <button
-                    className=" bg-blue-600 text-white p-3 rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 z-50"
+                    className="bg-primary text-primary-foreground p-4 rounded-full shadow-lg hover:bg-primary-hover transition-colors focus:outline-none focus:ring-2 focus:ring-primary z-50"
                     onClick={() => setShowChatbot(true)}
-                    aria-label="Abrir asistente financiero"
+                    aria-label="Open chatbot"
                 >
                     <FaComment className="text-xl" />
                 </button>
             )}
         </>
     );
-};
+}
 
 export default FinancialChatbot;

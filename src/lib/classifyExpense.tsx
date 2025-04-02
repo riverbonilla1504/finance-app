@@ -10,7 +10,6 @@ const categoryIcons: Record<string, JSX.Element> = {
   "Other": <FaQuestion />,
 };
 
-// 🔹 Asocia cada categoría con un color
 const getCategoryColor = (category: string) => {
   const colors: Record<string, string> = {
     "Food": "#ff5733",
@@ -22,7 +21,6 @@ const getCategoryColor = (category: string) => {
   return colors[category] || "#777";
 };
 
-// 🔹 Función para clasificar gastos usando Gemini 2.0 Flash
 export const classifyExpense = async (description: string) => {
   try {
     const response = await fetch(
@@ -51,15 +49,14 @@ export const classifyExpense = async (description: string) => {
     const data = await response.json();
     console.log("Respuesta completa de Gemini:", JSON.stringify(data, null, 2));
 
-    // 🔹 Verifica que la estructura de la respuesta sea válida
+
     if (!data?.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
       console.error("Error en la respuesta de Gemini:", data);
       throw new Error("No se pudo obtener una respuesta válida de Gemini.");
     }
 
-    // 🔹 Extrae y limpia la categoría (elimina espacios al principio y final)
-    const rawCategory = data.candidates[0].content.parts[0].text.trim(); // ⬅️ Eliminamos espacios al principio y al final
-    // 🔹 Verifica si la categoría es válid
+
+    const rawCategory = data.candidates[0].content.parts[0].text.trim();
     console.log("Categoría cruda:", rawCategory);
     const category = categoryIcons[rawCategory] ? rawCategory : "Other";
     console.log("Categoría final:", category);

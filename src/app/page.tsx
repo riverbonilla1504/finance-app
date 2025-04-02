@@ -266,9 +266,9 @@ export default function Home() {
       <Modal show={showAddIncomeModal} onClose={setShowAddIncomeModal}>
         <form onSubmit={addIncomeHandler} className="flex flex-col gap-8">
           <section className="flex flex-col gap-4">
-            <label htmlFor="amount">Income Amount</label>
+            <label htmlFor="amount" className="text-primary-foreground">Income Amount</label>
             <input
-              className="px-4 py-2 rounded-md bg-slate-700 text-slate-200"
+              className="px-4 py-2 rounded-md bg-card text-primary-foreground border border-border"
               id="amount"
               name="amount"
               type="number"
@@ -278,9 +278,9 @@ export default function Home() {
             />
           </section>
           <section className="flex flex-col gap-4">
-            <label htmlFor="description">Description</label>
+            <label htmlFor="description" className="text-primary-foreground">Description</label>
             <input
-              className="px-4 py-2 rounded-md bg-slate-700 text-slate-200"
+              className="px-4 py-2 rounded-md bg-card text-primary-foreground border border-border"
               id="description"
               type="text"
               name="description"
@@ -289,21 +289,24 @@ export default function Home() {
               required
             />
           </section>
-          <button type="submit" className="btn self-center text-lime-600">
+          <button
+            type="submit"
+            className="btn self-center rounded-2xl p-1 bg-primary hover:bg-primary-hover text-primary-foreground"
+          >
             Add Income
           </button>
 
           {income.length > 0 && (
             <section className="mt-4">
-              <h3 className="text-lg font-semibold">Income History</h3>
+              <h3 className="text-lg font-semibold text-primary-foreground">Income History</h3>
               <ul className="mt-2 max-h-40 overflow-y-auto">
                 {income.map((inc) => (
-                  <li key={inc.id} className="flex justify-between items-center">
-                    <span>{inc.description}</span>
+                  <li key={inc.id} className="flex justify-between items-center py-2 border-b border-border">
+                    <span className="text-secondary">{inc.description}</span>
                     <section className="flex items-center">
-                      <span>{currencyFormatter(inc.amount)}</span>
+                      <span className="text-success">{currencyFormatter(inc.amount)}</span>
                       <button
-                        className="ml-2 text-red-600"
+                        className="ml-2 text-error"
                         onClick={() => deleteIncomeEntryHandler(inc.id)}
                       >
                         <FaRegTrashAlt />
@@ -316,12 +319,13 @@ export default function Home() {
           )}
         </form>
       </Modal>
+
       <Modal show={showAddExpenseModal} onClose={setShowAddExpenseModal}>
         <form onSubmit={addExpenseHandler} className="flex flex-col gap-8">
           <section className="flex flex-col gap-4">
-            <label htmlFor="expenseAmount">Expense Amount</label>
+            <label htmlFor="expenseAmount" className="text-primary-foreground">Expense Amount</label>
             <input
-              className="px-4 py-2 rounded-md bg-slate-700 text-slate-200"
+              className="px-4 py-2 rounded-md bg-card text-primary-foreground border border-border"
               id="expenseAmount"
               name="expenseAmount"
               type="number"
@@ -331,9 +335,9 @@ export default function Home() {
             />
           </section>
           <section className="flex flex-col gap-4">
-            <label htmlFor="expenseDescription">Description</label>
+            <label htmlFor="expenseDescription" className="text-primary-foreground">Description</label>
             <input
-              className="px-4 py-2 rounded-md bg-slate-700 text-slate-200"
+              className="px-4 py-2 rounded-md bg-card text-primary-foreground border border-border"
               id="expenseDescription"
               type="text"
               name="expenseDescription"
@@ -342,44 +346,55 @@ export default function Home() {
               required
             />
           </section>
-          <button type="submit" className="btn self-center text-red-600">
+          <button
+            type="submit"
+            className="btn self-center rounded-2xl p-1 bg-primary hover:bg-primary-hover text-primary-foreground"
+          >
             Add Expense
           </button>
         </form>
       </Modal>
-      <main className="relative min-h-screen container max-w-2xl p-6 mx-auto font-poppins">
+
+      <main className="relative min-h-screen container max-w-2xl p-6 mx-auto font-poppins bg-background text-primary-foreground">
         <section>
-          <small className="text-md">My balance</small>
+          <small className="text-secondary">My balance</small>
           <h2 className="text-4xl font-bold">{currencyFormatter(balance)}</h2>
         </section>
+
         <section className="flex items-center justify-between mt-6">
-          <button onClick={() => setShowAddExpenseModal(true)} className="btn text-red-600">
+          <button
+            onClick={() => setShowAddExpenseModal(true)}
+            className="btn p-1 bg-primary rounded-2xl hover:bg-primary-hover text-primary-foreground"
+          >
             + Expenses
           </button>
-          <button onClick={() => setShowAddIncomeModal(true)} className="btn text-lime-600">
+          <button
+            onClick={() => setShowAddIncomeModal(true)}
+            className="btn  bg-primary rounded-2xl p-1 hover:bg-primary-hover text-primary-foreground"
+          >
             + Income
           </button>
         </section>
 
-        <section className="mt-8 p-4 bg-slate-800 rounded-lg">
+        <section className="card-glass mt-8 p-4 rounded-lg">
           <section className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-bold">Financial Overview</h3>
             <section className="flex flex-wrap gap-2 gap-y-2">
               <button
                 onClick={() => setActiveChart('expense')}
-                className={`px-3 py-1 rounded-md ${activeChart === 'expense' ? 'bg-red-600' : 'bg-slate-700'}`}
+                className={`px-3 py-1 rounded-md ${activeChart === 'expense' ? 'bg-error' : 'bg-card'}`}
               >
                 Expenses
               </button>
               <button
                 onClick={() => setActiveChart('income')}
-                className={`px-3 py-1 rounded-md ${activeChart === 'income' ? 'bg-lime-600' : 'bg-slate-700'}`}
+                className={`px-3 py-1 rounded-md ${activeChart === 'income' ? 'bg-success' : 'bg-card'}`}
               >
                 Monthly
               </button>
               <button
                 onClick={() => setActiveChart('both')}
-                className={`px-3 py-1 rounded-md ${activeChart === 'both' ? 'bg-blue-600' : 'bg-slate-700'}`}
+                className={`px-3 py-1 rounded-md ${activeChart === 'both' ? 'bg-savings' : 'bg-card'}`}
               >
                 Both
               </button>
@@ -392,7 +407,7 @@ export default function Home() {
                 <Doughnut data={prepareExpenseChartData()} options={doughnutOptions} />
               </section>
             ) : (
-              <p className="text-center py-8">No expense data to display</p>
+              <p className="text-center py-8 text-secondary">No expense data to display</p>
             )}
           </section>
 
@@ -402,7 +417,7 @@ export default function Home() {
                 <Bar data={prepareMonthlyComparisonData()} options={barOptions} />
               </section>
             ) : (
-              <p className="text-center py-8">No data to display</p>
+              <p className="text-center py-8 text-secondary">No data to display</p>
             )}
           </section>
         </section>
@@ -412,7 +427,7 @@ export default function Home() {
           {expenses.length > 0 ? (
             <ul className="max-h-64 overflow-y-auto">
               {expenses.map((expense) => (
-                <li key={expense.id} className="flex justify-between items-center mt-2">
+                <li key={expense.id} className="flex justify-between items-center mt-2 py-2 border-b border-border">
                   <section className="flex items-center">
                     <span
                       className="rounded-full w-8 h-8 flex items-center justify-center"
@@ -423,9 +438,9 @@ export default function Home() {
                     <span className="ml-2">{expense.description}</span>
                   </section>
                   <section className="flex items-center">
-                    <span>{currencyFormatter(expense.amount)}</span>
+                    <span className="text-error">{currencyFormatter(expense.amount)}</span>
                     <button
-                      className="ml-2 text-red-600"
+                      className="ml-2 text-error"
                       onClick={() => deleteExpenseEntryHandler(expense.id)}
                     >
                       <FaRegTrashAlt />
@@ -435,7 +450,7 @@ export default function Home() {
               ))}
             </ul>
           ) : (
-            <p>No expenses recorded.</p>
+            <p className="text-secondary">No expenses recorded.</p>
           )}
         </section>
 
@@ -444,12 +459,12 @@ export default function Home() {
           {income.length > 0 ? (
             <ul className="max-h-64 overflow-y-auto">
               {income.map((inc) => (
-                <li key={inc.id} className="flex justify-between items-center mt-2">
+                <li key={inc.id} className="flex justify-between items-center mt-2 py-2 border-b border-border">
                   <span>{inc.description}</span>
                   <section className="flex items-center">
-                    <span>{currencyFormatter(inc.amount)}</span>
+                    <span className="text-success">{currencyFormatter(inc.amount)}</span>
                     <button
-                      className="ml-2 text-red-600"
+                      className="ml-2 text-error"
                       onClick={() => deleteIncomeEntryHandler(inc.id)}
                     >
                       <FaRegTrashAlt />
@@ -459,7 +474,7 @@ export default function Home() {
               ))}
             </ul>
           ) : (
-            <p>No income recorded.</p>
+            <p className="text-secondary">No income recorded.</p>
           )}
         </section>
 

@@ -1,25 +1,97 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-  @apply bg-foreground text-slate-100 relative;
+@theme {
+  --font-poppins: "Poppins", sans-serif;
 
-}
 
-@layer utilities {
-  .btn {
-    @apply px-4 py-2 text-sm capitalize rounded-xl hover:scale-105 transition-all duration-100;
+  --color-background: hsl(30, 12%, 12%);
+  --color-foreground: hsl(40, 30%, 85%);
+  --color-card: hsl(30, 10%, 18%);
+  --color-card-foreground: hsl(40, 30%, 85%);
+  --color-border: hsl(30, 8%, 24%);
+
+
+  --color-primary: hsl(35, 40%, 50%);
+  --color-primary-foreground: hsl(40, 30%, 85%);
+  --color-primary-hover: hsl(35, 45%, 45%);
+
+
+  --color-secondary: hsl(35, 15%, 65%);
+  --color-secondary-foreground: hsl(30, 12%, 12%);
+
+
+  --color-success: hsl(80, 30%, 50%);
+  --color-error: hsl(10, 50%, 55%);
+  --color-warning: hsl(45, 60%, 50%);
+
+
+  --color-income: hsl(80, 30%, 50%);
+  --color-expenses: hsl(10, 50%, 55%);
+  --color-savings: hsl(200, 30%, 55%);
+
+
+  --animate-wiggle: wiggle 1s ease-in-out infinite;
+
+  @keyframes wiggle {
+
+    0%,
+    100% {
+      transform: rotate(-3deg);
+    }
+
+    50% {
+      transform: rotate(3deg);
+    }
   }
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-poppins: 'Poppins', sans-serif;
+@layer utilities {
+  .ease-custom {
+    transition-timing-function: cubic-bezier(0.43, 0.4, 0.29, 1.02);
+  }
+
+  .card-glass {
+    @apply backdrop-blur-lg backdrop-saturate-[1.8] rounded-[12px] border p-4;
+    background-color: rgba(47, 40, 33, 0.75);
+
+    border-color: rgba(63, 58, 52, 0.5);
+
+  }
 }
 
-/* Glassmorphism card effect */
+html,
+body,
+#__next {
+  height: 100%;
+  background-color: var(--color-background);
+}
+
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background-color: hsl(30, 10%, 18%);
+
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: hsl(35, 40%, 50%);
+
+  border-radius: 10px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: hsl(35, 45%, 45%);
+
+}
+
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(35, 40%, 50%) hsl(30, 10%, 18%);
+
+}
