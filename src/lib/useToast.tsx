@@ -34,7 +34,7 @@ export const useToast = () => {
     }, []);
 
     const ToastContainer = useMemo(() => () => (
-        <div
+        <section
             className="fixed bottom-4 right-4 z-50 space-y-2 w-full max-w-xs"
             aria-live="polite"
             role="region"
@@ -47,7 +47,7 @@ export const useToast = () => {
                     onDismiss={() => removeToast(toast.id)}
                 />
             ))}
-        </div>
+        </section>
     ), [toasts, removeToast]);
 
     return { showToast, ToastContainer };

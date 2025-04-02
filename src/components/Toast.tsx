@@ -49,7 +49,7 @@ const Toast = ({
     };
 
     return (
-        <div
+        <section
             role="alert"
             aria-live="polite"
             className={`transition-all duration-300 ${isVisible
@@ -57,7 +57,7 @@ const Toast = ({
                 : '-translate-x-full opacity-0'
                 }`}
         >
-            <div
+            <section
                 className={`${bgColorMap[variant]} border rounded-lg p-3 shadow-lg backdrop-blur-sm flex items-center gap-3 w-full`}
             >
                 <span className="text-lg flex-shrink-0">
@@ -66,8 +66,8 @@ const Toast = ({
                 <p className="text-primary-foreground text-sm">
                     {message}
                 </p>
-            </div>
-        </div>
+            </section>
+        </section>
     );
 };
 

@@ -18,7 +18,7 @@ export default function Navigation() {
     if (!authContext || authContext.loading) {
         return (
             <header className="flex items-center justify-between container max-w-2xl p-6 mx-auto">
-                <div className="h-10 w-10 rounded-full bg-card animate-pulse"></div>
+                <span className="h-10 w-10 rounded-full bg-card animate-pulse"></span>
             </header>
         );
     }
