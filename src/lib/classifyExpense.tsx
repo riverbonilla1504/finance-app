@@ -19,7 +19,7 @@ const getCategoryColor = (category: string) => {
     "Bills": "hsl(45, 60%, 50%)",     // Ámbar suave (--color-warning)
     "Other": "hsl(35, 15%, 65%)",      // Texto secundario
   };
-  return colors[category] || "hsl(35, 15%, 65%)"; // Default: color secundario
+  return colors[category] || "hsl(35, 15%, 65%)";
 };
 
 export const classifyExpense = async (description: string) => {

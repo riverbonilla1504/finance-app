@@ -1,46 +1,65 @@
 'use client';
 import { IoReloadCircle } from "react-icons/io5";
-
-import { useState } from "react";
+import { useState, useContext } from "react";
+import { AuthContext } from "@/lib/store/auth-context";
+import Image from "next/image";
 
 export default function Navigation() {
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const authContext = useContext(AuthContext);
 
     const handleRefresh = () => {
         setIsRefreshing(true);
-        // Simular un pequeño delay para la animación
         setTimeout(() => {
             window.location.reload();
         }, 800);
     };
 
+    if (!authContext || authContext.loading) {
+        return (
+            <header className="flex items-center justify-between container max-w-2xl p-6 mx-auto">
+                <div className="h-10 w-10 rounded-full bg-card animate-pulse"></div>
+            </header>
+        );
+    }
+
+    const { user, logout } = authContext;
+
     return (
         <main className="font-poppins bg-background">
             <header className="flex items-center justify-between container max-w-2xl p-6 mx-auto">
-                <span className="flex items-center gap-2">
-                    <figure className="h-10 w-10 rounded-full overflow-hidden border-2 border-border">
-                        <img
-                            src="/fototomas.jpg"
-                            alt="Foto de perfil"
-                            className="object-cover h-full w-full"
-                        />
-                    </figure>
-                    <small className="text-secondary">Hi, Tomas</small>
-                </span>
-                <nav className="flex items-center gap-4">
-                    <button
-                        onClick={handleRefresh}
-                        className="p-2 rounded-md bg-card hover:bg-primary transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background"
-                        aria-label="Recargar datos"
-                        disabled={isRefreshing}
-                    >
-                        {isRefreshing ? (
-                            <IoReloadCircle className="text-xl  text-primary-foreground animate-spin" />
-                        ) : (
-                            <IoReloadCircle className="text-xl  text-primary-foreground" />
-                        )}
-                    </button>
-                </nav>
+                {user ? (
+                    <>
+                        <span className="flex items-center gap-2">
+                            <figure className="h-10 w-10 rounded-full overflow-hidden border-2 border-border relative">
+                                <Image
+                                    src={user.photoURL || '/default-avatar.png'}
+                                    alt={user.displayName || 'User'}
+                                    fill
+                                    className="object-cover"
+                                    onError={(e) => {
+                                        const target = e.target as HTMLImageElement;
+                                        target.onerror = null;
+                                        target.src = '/default-avatar.png';
+                                    }}
+                                />
+                            </figure>
+                            <small className="text-secondary">
+                                Hi, {user.displayName || 'User'}
+                            </small>
+                        </span>
+                        <nav className="flex items-center gap-4">
+                            <button
+                                onClick={logout}
+                                className="py-1  px-2 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg rounded-md bg-error hover:bg-error/90 text-primary-foreground"
+                            >
+                                Logout
+                            </button>
+                        </nav>
+                    </>
+                ) : (
+                    <span></span>
+                )}
             </header>
         </main>
     );

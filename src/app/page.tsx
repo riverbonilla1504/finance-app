@@ -1,17 +1,20 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useContext } from "react";
 import { currencyFormatter } from "@/lib/utils";
 import { Modal } from "@/components/Modal";
 import { classifyExpense } from "@/lib/classifyExpense";
 import { getCategoryIcon } from "@/lib/Icons";
 import FinancialChatbot from "@/components/FinancialChatBot";
 import { Income, Expense } from "@/lib/types/financial";
+import { AuthContext } from "@/lib/store/auth-context";
+import SignIn from "@/components/SignIn";
+import { useToast } from "@/lib/useToast";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from "chart.js";
 import { Doughnut, Bar } from "react-chartjs-2";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { db } from "@/lib/firebase";
-import { addDoc, collection, deleteDoc, doc, getDocs } from "firebase/firestore";
+import { addDoc, collection, deleteDoc, doc, getDocs, where, query } from "firebase/firestore";
 
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
@@ -24,24 +27,43 @@ export default function Home() {
   const expenseAmountRef = useRef<HTMLInputElement>(null);
   const expenseDescriptionRef = useRef<HTMLInputElement>(null);
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const { showToast, ToastContainer } = useToast();
+  const [isLoading, setIsLoading] = useState({
+    income: false,
+    expense: false,
+    deleteIncome: false,
+    deleteExpense: false
+  });
 
   const totalIncome = income.reduce((sum, inc) => sum + inc.amount, 0);
   const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
   const balance = totalIncome - totalExpenses;
   const [activeChart, setActiveChart] = useState<'expense' | 'income' | 'both'>('both');
 
+  const authContext = useContext(AuthContext);
+  if (!authContext) {
+    return null;
+  }
+  const { user } = authContext;
+
   const addIncomeHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading({ ...isLoading, income: true });
     const amount = Number(amountRef.current?.value);
     const description = descriptionRef.current?.value;
 
-    if (!amount || !description) return;
+    if (!amount || !description) {
+      setIsLoading({ ...isLoading, income: false });
+      return;
+    }
 
     const newIncome: Omit<Income, "id"> = {
       amount,
       description,
       createAt: new Date(),
+      uid: user.uid
     };
+
 
     try {
       const docSnap = await addDoc(collection(db, "income"), newIncome);
@@ -52,90 +74,133 @@ export default function Home() {
       descriptionRef.current!.value = "";
       amountRef.current!.value = "";
       setShowAddIncomeModal(false);
+      showToast('Income added successfully!', 'success');
     } catch (error) {
       console.error("Error adding income:", error);
+      showToast('Failed to add income', 'error');
+    } finally {
+      setIsLoading({ ...isLoading, income: false });
     }
   };
 
   const deleteIncomeEntryHandler = async (id: string) => {
+    setIsLoading({ ...isLoading, deleteIncome: true });
     try {
       await deleteDoc(doc(db, "income", id));
       setIncome((prevState) => prevState.filter((income) => income.id !== id));
+      showToast('Income deleted successfully!', 'success');
     } catch (error) {
       console.error("Error deleting income:", error);
+      showToast('Failed to delete income', 'error');
+    } finally {
+      setIsLoading({ ...isLoading, deleteIncome: false });
     }
   };
 
   useEffect(() => {
     const getIncomeData = async () => {
-      const collectionRef = collection(db, "income");
-      const docSnap = await getDocs(collectionRef);
-      const data = docSnap.docs.map((doc) => ({
-        id: doc.id,
-        amount: doc.data().amount as number,
-        description: doc.data().description as string,
-        createAt: new Date(doc.data().createAt.toMillis()),
-      }));
-      setIncome(data);
+      if (!user) return;
+
+      try {
+        const collectionRef = collection(db, "income");
+        const q = query(collectionRef, where("uid", "==", user.uid));
+        const docSnap = await getDocs(q);
+        const data = docSnap.docs.map((doc) => ({
+          id: doc.id,
+          amount: doc.data().amount as number,
+          description: doc.data().description as string,
+          createAt: new Date(doc.data().createAt.toMillis()),
+          uid: doc.data().uid as string
+        }));
+        setIncome(data);
+        showToast('Income data loaded', 'info');
+      } catch (error) {
+        console.error("Error loading income data:", error);
+        showToast('Failed to load income data', 'error');
+      }
     };
     getIncomeData();
-  }, []);
+  }, [user]);
 
   const addExpenseHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading({ ...isLoading, expense: true });
     const amount = Number(expenseAmountRef.current?.value);
     const description = expenseDescriptionRef.current?.value;
 
-    if (!description || !amount) return;
-
-    const categoryData = await classifyExpense(description);
-
-    const newExpense: Omit<Expense, "id"> = {
-      amount,
-      description,
-      category: categoryData.category,
-      icon: String(categoryData.icon),
-      color: categoryData.color,
-      createAt: new Date(),
-    };
+    if (!description || !amount) {
+      setIsLoading({ ...isLoading, expense: false });
+      return;
+    }
 
     try {
+      const categoryData = await classifyExpense(description);
+      const newExpense: Omit<Expense, "id"> = {
+        amount,
+        description,
+        category: categoryData.category,
+        icon: String(categoryData.icon),
+        color: categoryData.color,
+        createAt: new Date(),
+        uid: user.uid
+      };
+
       const docRef = await addDoc(collection(db, "expenses"), newExpense);
       setExpenses((prev) => [...prev, { id: docRef.id, ...newExpense }]);
       expenseDescriptionRef.current!.value = "";
       expenseAmountRef.current!.value = "";
       setShowAddExpenseModal(false);
+      showToast('Expense added successfully!', 'success');
     } catch (error) {
       console.error("Error adding expense:", error);
+      showToast('Failed to add expense', 'error');
+    } finally {
+      setIsLoading({ ...isLoading, expense: false });
     }
   };
 
   const deleteExpenseEntryHandler = async (id: string) => {
+    setIsLoading({ ...isLoading, deleteExpense: true });
     try {
       await deleteDoc(doc(db, "expenses", id));
       setExpenses((prevState) => prevState.filter((expense) => expense.id !== id));
+      showToast('Expense deleted successfully!', 'success');
     } catch (error) {
       console.error("Error deleting expense:", error);
+      showToast('Failed to delete expense', 'error');
+    } finally {
+      setIsLoading({ ...isLoading, deleteExpense: false });
     }
   };
 
   useEffect(() => {
     const getExpenseData = async () => {
-      const collectionRef = collection(db, "expenses");
-      const docSnap = await getDocs(collectionRef);
-      const data = docSnap.docs.map((doc) => ({
-        id: doc.id,
-        amount: doc.data().amount as number,
-        description: doc.data().description as string,
-        category: doc.data().category as string,
-        icon: doc.data().icon as string,
-        color: doc.data().color as string,
-        createAt: new Date(doc.data().createAt.toMillis()),
-      }));
-      setExpenses(data);
+      if (!user) return;
+
+      try {
+        const collectionRef = collection(db, "expenses");
+        const q = query(collectionRef, where("uid", "==", user.uid));
+        const docSnap = await getDocs(q);
+        const data = docSnap.docs.map((doc) => ({
+          id: doc.id,
+          amount: doc.data().amount as number,
+          description: doc.data().description as string,
+          category: doc.data().category as string,
+          icon: doc.data().icon as string,
+          color: doc.data().color as string,
+          createAt: new Date(doc.data().createAt.toMillis()),
+          uid: doc.data().uid as string
+        }));
+        setExpenses(data);
+        showToast('Expenses data loaded', 'info');
+      } catch (error) {
+        console.error("Error loading expenses data:", error);
+        showToast('Failed to load expenses data', 'error');
+      }
     };
     getExpenseData();
-  }, []);
+  }, [user]);
+
 
   const prepareExpenseChartData = () => {
     const categoryMap = expenses.reduce((acc, expense) => {
@@ -261,8 +326,18 @@ export default function Home() {
     }
   };
 
+
+  if (!user) {
+    return (
+      <main className="flex flex-col items-center justify-center min-h-screen bg-background">
+        <SignIn />
+      </main>
+    );
+  }
+
   return (
     <>
+      <ToastContainer />
       <Modal show={showAddIncomeModal} onClose={setShowAddIncomeModal}>
         <form onSubmit={addIncomeHandler} className="flex flex-col gap-8">
           <section className="flex flex-col gap-4">
@@ -291,7 +366,7 @@ export default function Home() {
           </section>
           <button
             type="submit"
-            className="transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg self-center rounded-2xl p-1 bg-primary hover:bg-primary-hover text-primary-foreground"
+            className="px-3 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg self-center rounded-2xl p-1 bg-primary hover:bg-primary-hover text-primary-foreground"
           >
             Add Income
           </button>
@@ -348,7 +423,7 @@ export default function Home() {
           </section>
           <button
             type="submit"
-            className="transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg self-center rounded-2xl p-1 bg-primary hover:bg-primary-hover text-primary-foreground"
+            className="px-3 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg self-center rounded-2xl p-1 bg-primary hover:bg-primary-hover text-primary-foreground"
           >
             Add Expense
           </button>
@@ -361,16 +436,16 @@ export default function Home() {
           <h2 className="text-4xl font-bold">{currencyFormatter(balance)}</h2>
         </section>
 
-        <section className="flex items-center justify-between mt-6">
+        <section className="flex items-center justify-end gap-4 mt-6">
           <button
             onClick={() => setShowAddExpenseModal(true)}
-            className="transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg p-1 bg-primary rounded-2xl hover:bg-primary-hover text-primary-foreground"
+            className=" text-red-200 px-3 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg p-1 bg-primary rounded-2xl hover:bg-primary-hover"
           >
-            + Expenses
+            + Expense
           </button>
           <button
             onClick={() => setShowAddIncomeModal(true)}
-            className="transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg bg-primary rounded-2xl p-1 hover:bg-primary-hover text-primary-foreground"
+            className=" text-green-200 px-3 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg bg-primary rounded-2xl p-1 hover:bg-primary-hover"
           >
             + Income
           </button>
@@ -425,7 +500,10 @@ export default function Home() {
         <section className="mt-6">
           <h3 className="text-xl font-bold  ">Expenses</h3>
           {expenses.length > 0 ? (
-            <ul className="max-h-64 overflow-y-auto">
+            <ul className="max-h-64 overflow-y-auto [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full
+          [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar]:h-2
+          [&::-webkit-scrollbar-track]:bg-card [&::-webkit-scrollbar-thumb]:bg-primary
+          hover:[&::-webkit-scrollbar-thumb]:bg-primary-hover">
               {expenses.map((expense) => (
                 <li key={expense.id} className="flex justify-between items-center mt-2 py-2 border-b border-border">
                   <section className="flex items-center ">
@@ -478,7 +556,7 @@ export default function Home() {
           )}
         </section>
 
-        <span className="fixed bottom-4 flex justify-end p-6">
+        <span className="fixed bottom-4 flex justify-center p-6">
           <FinancialChatbot expenses={expenses} incomes={income} />
         </span>
       </main>

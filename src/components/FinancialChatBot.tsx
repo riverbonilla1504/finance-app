@@ -36,7 +36,7 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
 
-            // Solo ocultar/mostrar el botón, no el chat abierto
+
             if (!showChatbot) {
                 if (currentScrollY > lastScrollY && currentScrollY > 100) {
                     setIsButtonVisible(false);
@@ -152,12 +152,11 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
             return "Lo siento, no pude procesar tu consulta. Por favor, intenta de nuevo.";
         }
     };
-    // ... (getGeminiResponse function remains the same)
 
     return (
         <>
             {showChatbot && (
-                <article className=" max-w-2xl w-full sm:w-96 bg-card rounded-lg shadow-lg overflow-hidden border border-border z-50">
+                <article className=" transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg max-w-2xl w-full sm:w-96 bg-card rounded-lg shadow-lg overflow-hidden border border-border z-50">
                     <header className="bg-primary text-primary-foreground p-3 flex justify-between items-center">
                         <span className="font-medium">Finance Assistant</span>
                         <button
@@ -220,7 +219,7 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
 
             {!showChatbot && (
                 <button
-                    className={` bg-primary text-primary-foreground p-3 sm:p-4 rounded-full shadow-lg hover:bg-primary-hover transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary z-50 ${isButtonVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+                    className={` transform hover:-translate-y-1 hover:shadow-lg bg-primary text-primary-foreground p-3 sm:p-4 rounded-full shadow-lg hover:bg-primary-hover transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary z-50 ${isButtonVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
                         }`}
                     onClick={() => {
                         setShowChatbot(true);

@@ -8,6 +8,7 @@ export type Expense = {
     icon: string;
     color: string;
     createAt: Date;
+    uid: string;
 }
 
 export type Income = {
@@ -15,4 +16,5 @@ export type Income = {
     amount: number;
     description: string;
     createAt: Date;
+    uid: string;
 };
