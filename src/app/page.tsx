@@ -1,22 +1,18 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-
 import { currencyFormatter } from "@/lib/utils";
 import { Modal } from "@/components/Modal";
 import { classifyExpense } from "@/lib/classifyExpense";
 import { getCategoryIcon } from "@/lib/Icons";
 import FinancialChatbot from "@/components/FinancialChatBot";
 import { Income, Expense } from "@/lib/types/financial";
-
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title } from "chart.js";
 import { Doughnut, Bar } from "react-chartjs-2";
 import { FaRegTrashAlt } from "react-icons/fa";
-
 import { db } from "@/lib/firebase";
 import { addDoc, collection, deleteDoc, doc, getDocs } from "firebase/firestore";
 
-// Register Chart.js components
 ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, Title);
 
 export default function Home() {
@@ -24,7 +20,6 @@ export default function Home() {
   const [showAddIncomeModal, setShowAddIncomeModal] = useState(false);
   const amountRef = useRef<HTMLInputElement>(null);
   const descriptionRef = useRef<HTMLInputElement>(null);
-
   const [showAddExpenseModal, setShowAddExpenseModal] = useState(false);
   const expenseAmountRef = useRef<HTMLInputElement>(null);
   const expenseDescriptionRef = useRef<HTMLInputElement>(null);
@@ -33,13 +28,10 @@ export default function Home() {
   const totalIncome = income.reduce((sum, inc) => sum + inc.amount, 0);
   const totalExpenses = expenses.reduce((sum, exp) => sum + exp.amount, 0);
   const balance = totalIncome - totalExpenses;
-
-  // Chart display state
   const [activeChart, setActiveChart] = useState<'expense' | 'income' | 'both'>('both');
 
   const addIncomeHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const amount = Number(amountRef.current?.value);
     const description = descriptionRef.current?.value;
 
@@ -53,12 +45,10 @@ export default function Home() {
 
     try {
       const docSnap = await addDoc(collection(db, "income"), newIncome);
-
       setIncome((prevState) => [
         ...prevState,
         { id: docSnap.id, ...newIncome },
       ]);
-
       descriptionRef.current!.value = "";
       amountRef.current!.value = "";
       setShowAddIncomeModal(false);
@@ -93,7 +83,6 @@ export default function Home() {
 
   const addExpenseHandler = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const amount = Number(expenseAmountRef.current?.value);
     const description = expenseDescriptionRef.current?.value;
 
@@ -112,9 +101,7 @@ export default function Home() {
 
     try {
       const docRef = await addDoc(collection(db, "expenses"), newExpense);
-
       setExpenses((prev) => [...prev, { id: docRef.id, ...newExpense }]);
-
       expenseDescriptionRef.current!.value = "";
       expenseAmountRef.current!.value = "";
       setShowAddExpenseModal(false);
@@ -150,9 +137,7 @@ export default function Home() {
     getExpenseData();
   }, []);
 
-  // Prepare data for expense chart by category
   const prepareExpenseChartData = () => {
-    // Group expenses by category
     const categoryMap = expenses.reduce((acc, expense) => {
       if (!acc[expense.category]) {
         acc[expense.category] = {
@@ -180,18 +165,14 @@ export default function Home() {
     };
   };
 
-  // Prepare data for monthly income vs expense comparison
   const prepareMonthlyComparisonData = () => {
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-
-    // Initialize data structure for the current year
     const currentYear = new Date().getFullYear();
     const monthlyData = monthNames.reduce((acc, month, index) => {
       acc[index] = { income: 0, expense: 0 };
       return acc;
     }, {} as Record<number, { income: number, expense: number }>);
 
-    // Fill in income data
     income.forEach(inc => {
       const month = inc.createAt.getMonth();
       if (inc.createAt.getFullYear() === currentYear) {
@@ -199,7 +180,6 @@ export default function Home() {
       }
     });
 
-    // Fill in expense data
     expenses.forEach(exp => {
       const month = exp.createAt.getMonth();
       if (exp.createAt.getFullYear() === currentYear) {
@@ -228,7 +208,6 @@ export default function Home() {
     };
   };
 
-  // Chart options
   const doughnutOptions = {
     responsive: true,
     plugins: {
@@ -314,7 +293,6 @@ export default function Home() {
             Add Income
           </button>
 
-          {/* Income History */}
           {income.length > 0 && (
             <section className="mt-4">
               <h3 className="text-lg font-semibold">Income History</h3>
@@ -322,7 +300,7 @@ export default function Home() {
                 {income.map((inc) => (
                   <li key={inc.id} className="flex justify-between items-center">
                     <span>{inc.description}</span>
-                    <div className="flex items-center">
+                    <section className="flex items-center">
                       <span>{currencyFormatter(inc.amount)}</span>
                       <button
                         className="ml-2 text-red-600"
@@ -330,7 +308,7 @@ export default function Home() {
                       >
                         <FaRegTrashAlt />
                       </button>
-                    </div>
+                    </section>
                   </li>
                 ))}
               </ul>
@@ -383,11 +361,10 @@ export default function Home() {
           </button>
         </section>
 
-        {/* Chart Section */}
         <section className="mt-8 p-4 bg-slate-800 rounded-lg">
-          <div className="flex justify-between items-center mb-4">
+          <section className="flex justify-between items-center mb-4">
             <h3 className="text-xl font-bold">Financial Overview</h3>
-            <div className="flex gap-2">
+            <section className="flex flex-wrap gap-2 gap-y-2">
               <button
                 onClick={() => setActiveChart('expense')}
                 className={`px-3 py-1 rounded-md ${activeChart === 'expense' ? 'bg-red-600' : 'bg-slate-700'}`}
@@ -406,38 +383,37 @@ export default function Home() {
               >
                 Both
               </button>
-            </div>
-          </div>
+            </section>
+          </section>
 
-          <div className={`chart-container ${activeChart === 'expense' || activeChart === 'both' ? 'block' : 'hidden'}`}>
+          <section className={`${activeChart === 'expense' || activeChart === 'both' ? 'block' : 'hidden'}`}>
             {expenses.length > 0 ? (
-              <div className="h-64">
+              <section className="h-64">
                 <Doughnut data={prepareExpenseChartData()} options={doughnutOptions} />
-              </div>
+              </section>
             ) : (
               <p className="text-center py-8">No expense data to display</p>
             )}
-          </div>
+          </section>
 
-          <div className={`chart-container mt-8 ${activeChart === 'income' || activeChart === 'both' ? 'block' : 'hidden'}`}>
+          <section className={`mt-8 ${activeChart === 'income' || activeChart === 'both' ? 'block' : 'hidden'}`}>
             {(income.length > 0 || expenses.length > 0) ? (
-              <div className="h-64">
+              <section className="h-64">
                 <Bar data={prepareMonthlyComparisonData()} options={barOptions} />
-              </div>
+              </section>
             ) : (
               <p className="text-center py-8">No data to display</p>
             )}
-          </div>
+          </section>
         </section>
 
-        {/* Expenses List Section */}
         <section className="mt-6">
           <h3 className="text-xl font-bold">Expenses</h3>
           {expenses.length > 0 ? (
             <ul className="max-h-64 overflow-y-auto">
               {expenses.map((expense) => (
                 <li key={expense.id} className="flex justify-between items-center mt-2">
-                  <div className="flex items-center">
+                  <section className="flex items-center">
                     <span
                       className="rounded-full w-8 h-8 flex items-center justify-center"
                       style={{ backgroundColor: expense.color }}
@@ -445,8 +421,8 @@ export default function Home() {
                       {getCategoryIcon(expense.icon)}
                     </span>
                     <span className="ml-2">{expense.description}</span>
-                  </div>
-                  <div className="flex items-center">
+                  </section>
+                  <section className="flex items-center">
                     <span>{currencyFormatter(expense.amount)}</span>
                     <button
                       className="ml-2 text-red-600"
@@ -454,7 +430,7 @@ export default function Home() {
                     >
                       <FaRegTrashAlt />
                     </button>
-                  </div>
+                  </section>
                 </li>
               ))}
             </ul>
@@ -463,7 +439,6 @@ export default function Home() {
           )}
         </section>
 
-        {/* Income List Section */}
         <section className="mt-6">
           <h3 className="text-xl font-bold">Income</h3>
           {income.length > 0 ? (
@@ -471,7 +446,7 @@ export default function Home() {
               {income.map((inc) => (
                 <li key={inc.id} className="flex justify-between items-center mt-2">
                   <span>{inc.description}</span>
-                  <div className="flex items-center">
+                  <section className="flex items-center">
                     <span>{currencyFormatter(inc.amount)}</span>
                     <button
                       className="ml-2 text-red-600"
@@ -479,7 +454,7 @@ export default function Home() {
                     >
                       <FaRegTrashAlt />
                     </button>
-                  </div>
+                  </section>
                 </li>
               ))}
             </ul>
