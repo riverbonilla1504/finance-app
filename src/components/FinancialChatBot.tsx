@@ -131,7 +131,7 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
         <>
             {showChatbot && (
                 <div className="max-w-2xl  w-80 sm:w-96 bg-white rounded-lg shadow-lg overflow-hidden border border-gray-200 z-50">
-                    <div className="chatbot-header bg-blue-600 text-white p-3 flex justify-between items-center">
+                    <div className="chatbot-header bg-blue-600 text-black p-3 flex justify-between items-center">
                         <span className="font-medium">Asistente Financiero</span>
                         <button
                             onClick={() => setShowChatbot(false)}
