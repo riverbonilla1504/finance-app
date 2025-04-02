@@ -24,8 +24,9 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
     ]);
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
-    const [isVisible, setIsVisible] = useState(true);
+    const [isButtonVisible, setIsButtonVisible] = useState(true);
     const [lastScrollY, setLastScrollY] = useState(0);
+    const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
         scrollToBottom();
@@ -35,11 +36,13 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
         const handleScroll = () => {
             const currentScrollY = window.scrollY;
 
-            // Hide when scrolling down, show when scrolling up
-            if (currentScrollY > lastScrollY) {
-                setIsVisible(false);
-            } else {
-                setIsVisible(true);
+            // Solo ocultar/mostrar el botón, no el chat abierto
+            if (!showChatbot) {
+                if (currentScrollY > lastScrollY && currentScrollY > 100) {
+                    setIsButtonVisible(false);
+                } else {
+                    setIsButtonVisible(true);
+                }
             }
 
             setLastScrollY(currentScrollY);
@@ -50,7 +53,7 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
         return () => {
             window.removeEventListener('scroll', handleScroll);
         };
-    }, [lastScrollY]);
+    }, [lastScrollY, showChatbot]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -149,14 +152,14 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
             return "Lo siento, no pude procesar tu consulta. Por favor, intenta de nuevo.";
         }
     };
+    // ... (getGeminiResponse function remains the same)
 
     return (
-        <div className={`transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
+        <>
             {showChatbot && (
-                <article className="max-w-2xl w-80 sm:w-96 bg-card rounded-lg shadow-lg overflow-hidden border border-border z-50">
-
+                <article className=" max-w-2xl w-full sm:w-96 bg-card rounded-lg shadow-lg overflow-hidden border border-border z-50">
                     <header className="bg-primary text-primary-foreground p-3 flex justify-between items-center">
-                        <span className="font-medium">Finance Asistance</span>
+                        <span className="font-medium">Finance Assistant</span>
                         <button
                             onClick={() => setShowChatbot(false)}
                             className="text-primary-foreground hover:text-secondary transition-colors"
@@ -166,14 +169,11 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
                         </button>
                     </header>
 
-
-                    <section
-                        className="chatbot-messages h-80 overflow-y-auto p-3 bg-background/50
+                    <section className="chatbot-messages h-80 overflow-y-auto p-3 bg-background/50
           [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full
           [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar]:h-2
           [&::-webkit-scrollbar-track]:bg-card [&::-webkit-scrollbar-thumb]:bg-primary
-          hover:[&::-webkit-scrollbar-thumb]:bg-primary-hover"
-                    >
+          hover:[&::-webkit-scrollbar-thumb]:bg-primary-hover">
                         {chatMessages.map((msg, index) => (
                             <article
                                 key={index}
@@ -185,8 +185,6 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
                                 {msg.content}
                             </article>
                         ))}
-
-
                         {isLoading && (
                             <article className="bg-card text-primary-foreground p-3 rounded-lg mb-3 max-w-[85%] border border-border">
                                 <span className="typing-indicator flex space-x-2 justify-center">
@@ -199,39 +197,42 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
                         <span ref={messagesEndRef} />
                     </section>
 
-
-                    <form onSubmit={handleChatSubmit} className="p-3 border-t border-border flex">
+                    <form onSubmit={handleChatSubmit} className="p-2 sm:p-3 border-t border-border flex items-center gap-1">
                         <input
+                            ref={inputRef}
                             type="text"
                             value={chatInput}
                             onChange={(e) => setChatInput(e.target.value)}
                             placeholder="Ask about your finances..."
-                            className="flex-1 p-2 border border-border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-primary bg-card text-primary-foreground"
+                            className="flex-1 p-2 text-sm sm:text-base border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary bg-card text-primary-foreground"
                             disabled={isLoading}
                         />
                         <button
                             type="submit"
-                            className="bg-primary text-primary-foreground p-2 rounded-r-lg hover:bg-primary-hover transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
+                            className="p-2 sm:p-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary-hover transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
                             disabled={isLoading}
                         >
-                            <IoSend />
+                            <IoSend className="text-lg" />
                         </button>
                     </form>
                 </article>
             )}
 
-
             {!showChatbot && (
                 <button
-                    className="bg-primary text-primary-foreground p-4 rounded-full shadow-lg hover:bg-primary-hover transition-colors focus:outline-none focus:ring-2 focus:ring-primary z-50"
-                    onClick={() => setShowChatbot(true)}
+                    className={` bg-primary text-primary-foreground p-3 sm:p-4 rounded-full shadow-lg hover:bg-primary-hover transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary z-50 ${isButtonVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'
+                        }`}
+                    onClick={() => {
+                        setShowChatbot(true);
+                        setIsButtonVisible(true);
+                    }}
                     aria-label="Open chatbot"
                 >
                     <FaComment className="text-xl" />
                 </button>
             )}
-        </div>
+        </>
     );
-}
+};
 
 export default FinancialChatbot;
