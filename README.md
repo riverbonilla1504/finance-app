@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Finance Tracker App 🚀
 
-## Getting Started
+![App Screenshot](/screenshot.png) <!-- Add an image of your app here -->
 
-First, run the development server:
+Web application for personal financial management with integrated artificial intelligence for automatic expense categorization.
+
+## ✨ Main Features
+
+- 📊 Interactive financial dashboard
+- 💰 Income and expense tracking
+- 🏷️ Automatic categorization using Gemini AI
+- 📈 Data visualization with charts
+- 🤖 Smart financial assistant
+- 🔄 Real-time synchronization with Firestore
+- 💬 Chatbot with Gemini AI for financial queries
+
+## 🛠️ Technologies Used
+
+- **Frontend**: Next.js, Tailwind CSS, TypeScript
+- **Backend**: Firebase Firestore
+- **AI**: Google Gemini API
+- **Charts**: Chart.js
+- **Icons**: React Icons
+
+## 🔧 Prerequisites
+
+- Node.js v16+
+- npm or yarn
+- Firebase account
+- Google Gemini API Key
+
+## 🚀 How to Start the Project
+
+### Install dependencies
+
+```bash
+npm install
+# or
+yarn install
+```
+
+### Configure environment variables
+
+Create a `.env.local` file in the project root with:
+
+```env
+NEXT_PUBLIC_GEMINI_API_KEY=your-gemini-api-key
+```
+
+### Start the application
 
 ```bash
 npm run dev
 # or
 yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+The application will be available at: [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🧠 Technical Explanation
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Project Architecture
 
-## Learn More
+```bash
+finance-tracker/
+├── components/       # Reusable components
+├── lib/              # Utility functions
+├── types/            # TypeScript types
+├── firebase/         # Firebase configuration
+├── pages/            # Application routes
+└── styles/           # Global styles
+```
 
-To learn more about Next.js, take a look at the following resources:
+### Categorization Flow with Gemini AI
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. The user enters a new expense.
+2. The description is sent to Gemini API.
+3. Gemini returns the category, icon, and color.
+4. The app automatically displays the categorized expense.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```typescript
+// Example classification function
+async function classifyExpense(description: string) {
+  const response = await fetch(GEMINI_ENDPOINT, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${process.env.NEXT_PUBLIC_GEMINI_API_KEY}`
+    },
+    body: JSON.stringify({ description })
+  });
+  return response.json();
+}
+```
 
-## Deploy on Vercel
+### Firebase Integration
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Firestore**: Stores income and expenses.

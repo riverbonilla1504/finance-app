@@ -24,10 +24,33 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
     ]);
     const [isLoading, setIsLoading] = useState(false);
     const messagesEndRef = useRef<null | HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = useState(true);
+    const [lastScrollY, setLastScrollY] = useState(0);
 
     useEffect(() => {
         scrollToBottom();
     }, [chatMessages]);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            const currentScrollY = window.scrollY;
+
+            // Hide when scrolling down, show when scrolling up
+            if (currentScrollY > lastScrollY) {
+                setIsVisible(false);
+            } else {
+                setIsVisible(true);
+            }
+
+            setLastScrollY(currentScrollY);
+        };
+
+        window.addEventListener('scroll', handleScroll, { passive: true });
+
+        return () => {
+            window.removeEventListener('scroll', handleScroll);
+        };
+    }, [lastScrollY]);
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -128,7 +151,7 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
     };
 
     return (
-        <>
+        <div className={`transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
             {showChatbot && (
                 <article className="max-w-2xl w-80 sm:w-96 bg-card rounded-lg shadow-lg overflow-hidden border border-border z-50">
 
@@ -207,7 +230,7 @@ const FinancialChatbot: React.FC<FinancialChatbotProps> = ({ expenses, incomes }
                     <FaComment className="text-xl" />
                 </button>
             )}
-        </>
+        </div>
     );
 }
 

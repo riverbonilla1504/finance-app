@@ -12,13 +12,14 @@ const categoryIcons: Record<string, JSX.Element> = {
 
 const getCategoryColor = (category: string) => {
   const colors: Record<string, string> = {
-    "Food": "#ff5733",
-    "Transport": "#ffbd33",
-    "Entertainment": "#3380ff",
-    "Shopping": "#33ff57",
-    "Other": "#777",
+    "Food": "hsl(10, 50%, 55%)",      // Rojo terroso (--color-error)
+    "Transport": "hsl(35, 40%, 50%)", // Dorado crema (--color-primary)
+    "Entertainment": "hsl(200, 30%, 55%)", // Azul crema (--color-savings)
+    "Shopping": "hsl(80, 30%, 50%)",   // Verde cremoso (--color-success)
+    "Bills": "hsl(45, 60%, 50%)",     // Ámbar suave (--color-warning)
+    "Other": "hsl(35, 15%, 65%)",      // Texto secundario
   };
-  return colors[category] || "#777";
+  return colors[category] || "hsl(35, 15%, 65%)"; // Default: color secundario
 };
 
 export const classifyExpense = async (description: string) => {

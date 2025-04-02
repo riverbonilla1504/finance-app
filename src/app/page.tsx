@@ -268,7 +268,7 @@ export default function Home() {
           <section className="flex flex-col gap-4">
             <label htmlFor="amount" className="text-primary-foreground">Income Amount</label>
             <input
-              className="px-4 py-2 rounded-md bg-card text-primary-foreground border border-border"
+              className="px-4 py-2 font-poppins rounded-md bg-card text-primary-foreground border border-border"
               id="amount"
               name="amount"
               type="number"
@@ -291,7 +291,7 @@ export default function Home() {
           </section>
           <button
             type="submit"
-            className="btn self-center rounded-2xl p-1 bg-primary hover:bg-primary-hover text-primary-foreground"
+            className="transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg self-center rounded-2xl p-1 bg-primary hover:bg-primary-hover text-primary-foreground"
           >
             Add Income
           </button>
@@ -306,7 +306,7 @@ export default function Home() {
                     <section className="flex items-center">
                       <span className="text-success">{currencyFormatter(inc.amount)}</span>
                       <button
-                        className="ml-2 text-error"
+                        className="ml-2 text-error transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg"
                         onClick={() => deleteIncomeEntryHandler(inc.id)}
                       >
                         <FaRegTrashAlt />
@@ -325,7 +325,7 @@ export default function Home() {
           <section className="flex flex-col gap-4">
             <label htmlFor="expenseAmount" className="text-primary-foreground">Expense Amount</label>
             <input
-              className="px-4 py-2 rounded-md bg-card text-primary-foreground border border-border"
+              className="px-4 py-2 rounded-md font-poppins bg-card text-primary-foreground border border-border"
               id="expenseAmount"
               name="expenseAmount"
               type="number"
@@ -348,7 +348,7 @@ export default function Home() {
           </section>
           <button
             type="submit"
-            className="btn self-center rounded-2xl p-1 bg-primary hover:bg-primary-hover text-primary-foreground"
+            className="transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg self-center rounded-2xl p-1 bg-primary hover:bg-primary-hover text-primary-foreground"
           >
             Add Expense
           </button>
@@ -364,13 +364,13 @@ export default function Home() {
         <section className="flex items-center justify-between mt-6">
           <button
             onClick={() => setShowAddExpenseModal(true)}
-            className="btn p-1 bg-primary rounded-2xl hover:bg-primary-hover text-primary-foreground"
+            className="transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg p-1 bg-primary rounded-2xl hover:bg-primary-hover text-primary-foreground"
           >
             + Expenses
           </button>
           <button
             onClick={() => setShowAddIncomeModal(true)}
-            className="btn  bg-primary rounded-2xl p-1 hover:bg-primary-hover text-primary-foreground"
+            className="transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg bg-primary rounded-2xl p-1 hover:bg-primary-hover text-primary-foreground"
           >
             + Income
           </button>
@@ -382,19 +382,19 @@ export default function Home() {
             <section className="flex flex-wrap gap-2 gap-y-2">
               <button
                 onClick={() => setActiveChart('expense')}
-                className={`px-3 py-1 rounded-md ${activeChart === 'expense' ? 'bg-error' : 'bg-card'}`}
+                className={` transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg px-3 py-1 rounded-md ${activeChart === 'expense' ? 'bg-error' : 'bg-card'}`}
               >
                 Expenses
               </button>
               <button
                 onClick={() => setActiveChart('income')}
-                className={`px-3 py-1 rounded-md ${activeChart === 'income' ? 'bg-success' : 'bg-card'}`}
+                className={`transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg px-3 py-1 rounded-md ${activeChart === 'income' ? 'bg-success' : 'bg-card'}`}
               >
                 Monthly
               </button>
               <button
                 onClick={() => setActiveChart('both')}
-                className={`px-3 py-1 rounded-md ${activeChart === 'both' ? 'bg-savings' : 'bg-card'}`}
+                className={`transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg px-3 py-1 rounded-md ${activeChart === 'both' ? 'bg-savings' : 'bg-card'}`}
               >
                 Both
               </button>
@@ -423,14 +423,14 @@ export default function Home() {
         </section>
 
         <section className="mt-6">
-          <h3 className="text-xl font-bold">Expenses</h3>
+          <h3 className="text-xl font-bold  ">Expenses</h3>
           {expenses.length > 0 ? (
             <ul className="max-h-64 overflow-y-auto">
               {expenses.map((expense) => (
                 <li key={expense.id} className="flex justify-between items-center mt-2 py-2 border-b border-border">
-                  <section className="flex items-center">
+                  <section className="flex items-center ">
                     <span
-                      className="rounded-full w-8 h-8 flex items-center justify-center"
+                      className="rounded-full w-8 h-8 flex items-center justify-center "
                       style={{ backgroundColor: expense.color }}
                     >
                       {getCategoryIcon(expense.icon)}
@@ -440,7 +440,7 @@ export default function Home() {
                   <section className="flex items-center">
                     <span className="text-error">{currencyFormatter(expense.amount)}</span>
                     <button
-                      className="ml-2 text-error"
+                      className="ml-2 text-error transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg"
                       onClick={() => deleteExpenseEntryHandler(expense.id)}
                     >
                       <FaRegTrashAlt />
@@ -455,7 +455,7 @@ export default function Home() {
         </section>
 
         <section className="mt-6">
-          <h3 className="text-xl font-bold">Income</h3>
+          <h3 className="text-xl font-bold ">Income</h3>
           {income.length > 0 ? (
             <ul className="max-h-64 overflow-y-auto">
               {income.map((inc) => (
@@ -464,7 +464,7 @@ export default function Home() {
                   <section className="flex items-center">
                     <span className="text-success">{currencyFormatter(inc.amount)}</span>
                     <button
-                      className="ml-2 text-error"
+                      className="ml-2 text-error transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg"
                       onClick={() => deleteIncomeEntryHandler(inc.id)}
                     >
                       <FaRegTrashAlt />
